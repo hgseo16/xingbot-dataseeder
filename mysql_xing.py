@@ -27,22 +27,22 @@ try:
     conn.select_db('틱봉')
     curs.execute('CREATE TABLE 삼성전자'
                  '(ID INT NOT NULL PRIMARY KEY,'
-                 '날짜 INT NULL,'
-                 '시간 INT NULL,'
+                 '날짜 VARCHAR(30) NULL,'
+                 '시간 VARCHAR(30) NULL,'
                  '시가 INT NULL,'
                  '고가 INT NULL,'
                  '저가 INT NULL,'
                  '종가 INT NULL,'
-                 '5평선 INT NULL,'
-                 '10평선 INT NULL,'
-                 '20평선 INT NULL,'
-                 '60평선 INT NULL,'
-                 '120평선 INT NULL,'
+                 '5평선 FLOAT NULL,'
+                 '10평선 FLOAT NULL,'
+                 '20평선 FLOAT NULL,'
+                 '60평선 FLOAT NULL,'
+                 '120평선 FLOAT NULL,'
                  '거래량 INT NULL,'
-                 '5평선거래량 INT NULL,'
-                 '20평선거래량 INT NULL,'
-                 '60평선거래량 INT NULL,'
-                 '1200평선거래량 INT NULL)')
+                 '5평선거래량 FLOAT NULL,'
+                 '20평선거래량 FLOAT NULL,'
+                 '60평선거래량 FLOAT NULL,'
+                 '1200평선거래량 FLOAT NULL)')
 
 finally:
     conn.close()
