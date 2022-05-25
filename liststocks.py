@@ -16,6 +16,7 @@ class EventClass_t9945:
 
         if code == "t9945":
             occurs_count = self.GetBlockCount("t9945OutBlock")
+            print(occurs_count)
             for i in range(occurs_count):
                 # Ticker Name (종목명)
                 hname = self.GetFieldData("t9945OutBlock", "hname", i)

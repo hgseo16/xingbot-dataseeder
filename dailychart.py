@@ -83,5 +83,6 @@ def t8413_request(shcode=None, gubun=None, qrycnt=None, sdate=None, edate=None, 
     EventClass_t8413.t8413_e.Request(occurs)
 
     EventClass_t8413.tr_success = False
+
     while EventClass_t8413.tr_success == False:
         pcom.PumpWaitingMessages()
