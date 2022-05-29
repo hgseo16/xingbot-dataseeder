@@ -34,8 +34,6 @@ class EventClass_t3518:
 
     def OnReceiveData(self, code):
 
-        print("OnReceiveData")
-
         if code == "t3518":
             occurs_count = self.GetBlockCount("t3518OutBlock1")
             cts_date = self.GetFieldData("t3518OutBlock", "cts_date", 0)
@@ -87,7 +85,6 @@ class EventClass_t3518:
                 t3518_request(kind="S", symbol="SPI@SPX", cnt=500, jgbn=None, nmin="", cts_date=cts_date,
                   cts_time=cts_time, occurs=self.IsNext)
             else:
-                print(len(self.date_list))
                 EventClass_t3518.tr_success = True
 
 
