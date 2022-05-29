@@ -52,6 +52,7 @@ class Main():
         SPY_t3518.t3518_e = wc.DispatchWithEvents("XA_DataSet.XAQuery", SPY_t3518)
         SPY_t3518.t3518_e.ResFileName = "C:/eBEST/xingAPI/Res/t3518.res"
         t3518_request(kind='S', symbol='SPI@SPX', cnt='500', jgbn='0', nmin='', cts_date='', cts_time='', occurs=False)
+        # Seed daily data of SPI@SPX to mysql
         mysql_spy(EventClass_t3518.date_list, EventClass_t3518.time_list, EventClass_t3518.open_list, EventClass_t3518.high_list, EventClass_t3518.low_list, EventClass_t3518.price_list, EventClass_t3518.sign_list, EventClass_t3518.change_list, EventClass_t3518.uprate_list, EventClass_t3518.volume_list, EventClass_t3518.kodate_list, EventClass_t3518.kotime_list)
 
 if __name__ == "__main__":

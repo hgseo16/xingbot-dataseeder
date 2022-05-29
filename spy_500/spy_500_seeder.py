@@ -67,18 +67,6 @@ class EventClass_t3518:
                 EventClass_t3518.kodate_list.append(kodate)
                 EventClass_t3518.kotime_list.append(kotime)
 
-            # print(EventClass_t3518.date_list)
-            # print(EventClass_t3518.time_list)
-            # print(EventClass_t3518.open_list)
-            # print(EventClass_t3518.high_list)
-            # print(EventClass_t3518.low_list)
-            # print(EventClass_t3518.price_list)
-            # print(EventClass_t3518.sign_list)
-            # print(EventClass_t3518.change_list)
-            # print(EventClass_t3518.uprate_list)
-            # print(EventClass_t3518.volume_list)
-            # print(EventClass_t3518.kodate_list)
-            # print(EventClass_t3518.kotime_list)
 
             if cts_date != "":
                 # 다음 과거 데이터로 계산
