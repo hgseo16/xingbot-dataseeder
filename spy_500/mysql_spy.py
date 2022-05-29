@@ -1,5 +1,4 @@
 import pymysql
-import xlrd
 import os
 from dotenv import load_dotenv
 
