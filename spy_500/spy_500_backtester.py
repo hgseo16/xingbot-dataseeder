@@ -8,9 +8,14 @@ class Backtest_Engine:
 
     def __init__(self):
         print('Backtest_Engine Running...')
-        self.initial_capital = 10000
-        self.available_capital = 10000
+        self.initial_capital = 1000
+        self.available_capital = 1000
         self.end_capital = self.initial_capital
+
+        self.stock_held = False
+        self.stock_held_percentage = 0
+        self.amount_bought = 0
+
         self.buy_commission = 0.0
         self.sell_commission = 0.0
         # Unused for now
@@ -81,13 +86,14 @@ class Backtest_Engine:
             if len(SMA_20_list) == 20:
                 SMA_20 = self.get_SMA(SMA_20_list, 20)
 
+            # While stock is being held...
+            if self.stock_held == True:
+                # row[8] is 등락률 or % change for the day
+                self.stock_held_percentage += (row[8] * 100)
+
             # Buy Condition
-            # if (curr_price > SMA_3) or (curr_price > SMA_5) or (curr_price > SMA_10):
-            #     self.initial_capital
+            if (self.stock_held == False) and ((curr_price > SMA_3) or (curr_price > SMA_5) or (curr_price > SMA_10)):
+                self.stock_held = True
 
-            # Buy and Hold
-        if start is False:
-            start = True
-            num_stocks_bought = int(self.initial_capital / row[5])
 
-            print(num_stocks_bought)
+
