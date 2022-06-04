@@ -9,11 +9,14 @@ class Backtest_Engine:
     def __init__(self):
         print('Backtest_Engine Running...')
         self.initial_capital = 1000
-        self.available_capital = 1000
-        self.end_capital = self.initial_capital
-
+        self.available_capital = self.initial_capital
+        self.end_capital = None
+        # Boolean for whether stock is being held or not
         self.stock_held = False
         self.stock_held_percentage = 0
+        # Number of stocks bought
+        self.num_bought = 0
+        # Amount of stocks bought in dollars
         self.amount_bought = 0
 
         self.buy_commission = 0.0
@@ -94,6 +97,6 @@ class Backtest_Engine:
             # Buy Condition
             if (self.stock_held == False) and ((curr_price > SMA_3) or (curr_price > SMA_5) or (curr_price > SMA_10)):
                 self.stock_held = True
-
+                self.amount_bought = int(self.available_capital / row[5])
 
 
