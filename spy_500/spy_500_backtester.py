@@ -9,11 +9,11 @@ class Backtest_Engine:
 
     def __init__(self):
         print('Backtest_Engine Running...')
-        initial_capital = 10000
-        buy_commission = 0.0
-        sell_commission = 0.0
-        start_date = None
-        end_date = datetime.datetime.now()
+        self.initial_capital = 10000
+        self.buy_commission = 0.0
+        self.sell_commission = 0.0
+        self.start_date = None
+        self.end_date = datetime.datetime.now()
 
         load_dotenv()
 
@@ -25,11 +25,29 @@ class Backtest_Engine:
             curs = conn.cursor()
             query_text = 'SELECT * FROM spy_500_daily'
             curs.execute(query_text)
-            rs = curs.fetchall()
-            for row in rs:
-                print(row)
-            print(len(rs))
+            self.rs = curs.fetchall()
 
         finally:
             conn.close()
-        # conn.commit()
+
+        self.Strategy()
+
+    def get_SMA(self, SMA_list):
+        size = len(SMA_list)
+        return sum(SMA_list) / size
+
+
+    def Strategy(self):
+        SMA_5_list = []
+        SMA_10_list = []
+        SMA_20_list = []
+        SMA_5 = None
+        SMA_10 = None
+        SMA_20 = None
+
+        for row in self.rs:
+            SMA_5_list.append()
+            SMA_10_list.append()
+            SMA_20_list.append()
+            print(row)
+        print(len(self.rs))
