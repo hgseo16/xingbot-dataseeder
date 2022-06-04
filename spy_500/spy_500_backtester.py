@@ -43,6 +43,7 @@ class Backtest_Engine:
 
 
     def Strategy(self):
+        start = False
         SMA_3_list = []
         SMA_5_list = []
         SMA_10_list = []
@@ -81,5 +82,12 @@ class Backtest_Engine:
                 SMA_20 = self.get_SMA(SMA_20_list, 20)
 
             # Buy Condition
-            if (curr_price > SMA_3) or (curr_price > SMA_5) or (curr_price > SMA_10):
-                self.initial_capital
+            # if (curr_price > SMA_3) or (curr_price > SMA_5) or (curr_price > SMA_10):
+            #     self.initial_capital
+
+            # Buy and Hold
+        if start is False:
+            start = True
+            num_stocks_bought = int(self.initial_capital / row[5])
+
+            print(num_stocks_bought)
