@@ -1,4 +1,4 @@
-import time
+import time as timefnc
 import pythoncom as pcom
 import pymysql
 import os
@@ -42,8 +42,14 @@ class EventClass_t3518:
 
     conn = pymysql.connect(host='127.0.0.1', user='root', password=AUTHENTICATION_PASSWORD, charset='utf8')
 
+    curs = conn.cursor()
+
+    # For Deleting and Recreating db spy_500
+    curs.execute('DROP DATABASE IF EXISTS SPY_500')
+    curs.execute('CREATE DATABASE SPY_500')
+    conn.select_db('SPY_500')
     sql_set_table_daily_data = '''
-    CREATE TABLE SPY_500_daily 
+    CREATE TABLE SPY_500_daily
     (날짜 VARCHAR(30) NOT NULL PRIMARY KEY,
     시간 VARCHAR(30) NULL,
     시가 FLOAT NULL,
@@ -57,11 +63,6 @@ class EventClass_t3518:
     한국일자 VARCHAR(30) NULL,
     한국시간 VARCHAR(30) NULL)
     '''
-
-    curs = conn.cursor()
-    curs.execute('DROP DATABASE IF EXISTS SPY_500')
-    curs.execute('CREATE DATABASE SPY_500')
-    conn.select_db('SPY_500')
     curs.execute(sql_set_table_daily_data)
     conn.commit()
 
@@ -113,7 +114,7 @@ class EventClass_t3518:
 
 def t3518_request(kind=None, symbol=None, cnt=None, jgbn=None, nmin=None, cts_date=None,
                   cts_time=None, occurs=False):
-    time.sleep(3.1)
+    timefnc.sleep(3.1)
     EventClass_t3518.t3518_e.SetFieldData("t3518InBlock", "kind", 0, "S")
     EventClass_t3518.t3518_e.SetFieldData("t3518InBlock", "symbol", 0, symbol)
     EventClass_t3518.t3518_e.SetFieldData("t3518InBlock", "cnt", 0, "500")

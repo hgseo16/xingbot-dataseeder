@@ -2,8 +2,9 @@ from login import *
 from dotenv import load_dotenv
 from liststocks import *
 from dailychart import *
-from spy_500.spy_500_seeder import *
+# from spy_500.spy_500_seeder import *
 from spy_500.mysql_spy import *
+from spy_500.spy_500_backtester import *
 
 import time
 import os
@@ -39,7 +40,7 @@ class Main():
         # print("ID: %s, PASSWORD: %s, AUTHENTICATION_PASSWORD: %s" % (ID, PASSWORD, AUTHENTICATION_PASSWORD))
 
         if self.XASession.Login(ID, PASSWORD, AUTHENTICATION_PASSWORD, 0, False):
-            print("로그인 요청 성공")
+            print("로그인 요청")
 
         while XASessionCallbackEvent.login_success == False:
             # Runs a loop which checks whether are there messages
@@ -48,17 +49,17 @@ class Main():
             # Give time as this loop eats up too much CPU
             time.sleep(0.1)
 
-        # Look up Day Candles for SPI@SPX
-        SPY_t3518 = EventClass_t3518
-        SPY_t3518.t3518_e = wc.DispatchWithEvents("XA_DataSet.XAQuery", SPY_t3518)
-        SPY_t3518.t3518_e.ResFileName = "C:/eBEST/xingAPI/Res/t3518.res"
-        t3518_request(kind='S', symbol='SPI@SPX', cnt='500', jgbn='0', nmin='', cts_date='', cts_time='', occurs=False)
-        # Seed daily data of SPI@SPX to mysql
-        # mysql_spy(EventClass_t3518.date_list, EventClass_t3518.time_list, EventClass_t3518.open_list, EventClass_t3518.high_list, EventClass_t3518.low_list, EventClass_t3518.price_list, EventClass_t3518.sign_list, EventClass_t3518.change_list, EventClass_t3518.uprate_list, EventClass_t3518.volume_list, EventClass_t3518.kodate_list, EventClass_t3518.kotime_list)
+        # Look up Day Candles for SPI@SPX and Stores them in mySQL
+        # SPY_t3518 = EventClass_t3518
+        # SPY_t3518.t3518_e = wc.DispatchWithEvents("XA_DataSet.XAQuery", SPY_t3518)
+        # SPY_t3518.t3518_e.ResFileName = "C:/eBEST/xingAPI/Res/t3518.res"
+        # t3518_request(kind='S', symbol='SPI@SPX', cnt='500', jgbn='0', nmin='', cts_date='', cts_time='', occurs=False)
+
+        Backtest_Engine()
 
 if __name__ == "__main__":
     start = time.time()
-    print(start)
+    # print(start)
     Main()
     end = time.time()
     print(f"Runtime of the program is {end - start}")
