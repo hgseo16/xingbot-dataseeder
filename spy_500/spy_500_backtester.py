@@ -25,6 +25,8 @@ class Backtest_Engine:
         # self.start_date = None
         # self.end_date = datetime.datetime.now()
 
+        self.cnt = 0
+
         load_dotenv()
 
         AUTHENTICATION_PASSWORD = os.environ.get('AUTHENTICATION_PASSWORD')
@@ -92,42 +94,53 @@ class Backtest_Engine:
             # While stock is being held...
             if self.stock_held == True:
                 # row[8] is 등락률 or % change for the day
-                self.stock_held_percentage += (row[8] * 100)
+                self.stock_held_percentage += (row[8])
+                print("")
+                print("당일등락률: {}".format(row[8]))
+                print("등락률: {}".format(self.stock_held_percentage))
 
             # Buy Condition
             if (SMA_3 != 0) and (self.stock_held == False) and ((curr_price > float(SMA_3)) or (curr_price > float(SMA_5)) or (curr_price > float(SMA_10))):
                 if self.available_capital < row[5]:
                     continue
                 self.stock_held = True
-                temp = round(self.available_capital / row[5])
-                self.num_bought = int(temp)
+                # temp = self.available_capital // row[5]
+                self.num_bought = int(self.available_capital // row[5])
                 self.amount_bought = self.num_bought * row[5]
                 self.available_capital -= self.amount_bought
                 print('--------------------')
-                print('BOUGHT')
+                print('BOUGHT: {}'.format(row[0]))
                 print("available_capital: {}".format(self.available_capital))
                 print("stock_held_percentage: {}".format(self.stock_held_percentage))
                 print("num_bought: {}".format(self.num_bought))
                 print("amount_bought: {}".format(self.amount_bought))
 
             # Sell Condition
-            if (self.stock_held == True) and ((curr_price <= float(SMA_3)) and (curr_price <= float(SMA_5)) and (curr_price <= float(SMA_10))):
+            # if (self.stock_held == True) and ((curr_price <= float(SMA_3)) and (curr_price <= float(SMA_5)) and (curr_price <= float(SMA_10))):
+            if (self.stock_held == True) and ((curr_price <= float(SMA_20)) or self.stock_held_percentage <= -1.0):
+
                 self.stock_held = False
-                gain = (self.amount_bought * self.stock_held_percentage)
+
+                gain = round(self.amount_bought * (1 + self.stock_held_percentage))
                 self.available_capital += gain
                 self.num_bought = 0
                 self.amount_bought = 0.0
                 print('--------------------')
-                print('SOLD')
+                print('SOLD: {}'.format(row[0]))
                 print("available_capital: {}".format(self.available_capital))
                 print("stock_held_percentage: {}".format(self.stock_held_percentage))
                 print("gain: {}".format(gain))
                 print("num_bought: {}".format(self.num_bought))
                 print("amount_bought: {}".format(self.amount_bought))
                 self.stock_held_percentage = 0.0
+                self.cnt+=1
 
-        # print("initial_capital: {}".format(self.initial_capital))
-        # print("available_capital: {}".format(self.available_capital))
-        # print("stock_held_percentage: {}".format(self.stock_held_percentage))
-        # print("num_bought: {}".format(self.num_bought))
+        print('--------------------')
+        print('FINAL: {}'.format(row[0]))
+        gain = round(self.amount_bought * (1 + self.stock_held_percentage))
+        self.available_capital += gain
+        print("Total profit: {}".format(self.available_capital))
+        print("stock_held_percentage: {}".format(self.stock_held_percentage))
+        print("num_bought: {}".format(self.num_bought))
         # print("amount_bought: {}".format(self.amount_bought))
+        print("Number of Trades: {}".format(self.cnt))
