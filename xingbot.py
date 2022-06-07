@@ -6,6 +6,8 @@ from dailychart import *
 from spy_500.mysql_spy import *
 from spy_500.spy_500_backtester import *
 
+from liststocks import *
+
 import time
 import os
 import win32com.client as wc
@@ -55,7 +57,11 @@ class Main():
         # SPY_t3518.t3518_e.ResFileName = "C:/eBEST/xingAPI/Res/t3518.res"
         # t3518_request(kind='S', symbol='SPI@SPX', cnt='500', jgbn='0', nmin='', cts_date='', cts_time='', occurs=False)
 
-        Backtest_Engine()
+        # Backtests w/ SPY
+        # Backtest_Engine()
+
+
+        # Implement calling for ETF data
 
 if __name__ == "__main__":
     start = time.time()
