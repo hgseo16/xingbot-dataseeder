@@ -6,6 +6,8 @@ from dailychart import *
 from spy_500.mysql_spy import *
 from spy_500.spy_500_backtester import *
 
+from kospi_kosdaq.kospi_kosdaq_daily import *
+
 from liststocks import *
 
 import time
@@ -39,8 +41,6 @@ class Main():
         PASSWORD = os.environ.get('PASSWORD')
         AUTHENTICATION_PASSWORD = os.environ.get('AUTHENTICATION_PASSWORD')
 
-        # print("ID: %s, PASSWORD: %s, AUTHENTICATION_PASSWORD: %s" % (ID, PASSWORD, AUTHENTICATION_PASSWORD))
-
         if self.XASession.Login(ID, PASSWORD, AUTHENTICATION_PASSWORD, 0, False):
             print("로그인 요청")
 
@@ -62,6 +62,17 @@ class Main():
 
 
         # Implement calling for ETF data
+        # KODEX 레버리지 (122630)
+        KODEX_LEVERAGE_t1903 = EventClass_t1903
+        KODEX_LEVERAGE_t1903.t1903_e = wc.DispatchWithEvents("XA_DataSet.XAQuery", KODEX_LEVERAGE_t1903)
+        KODEX_LEVERAGE_t1903.t1903_e.ResFileName = "C:/eBEST/xingAPI/Res/t1903.res"
+        KODEX_LEVERAGE_t1903.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, "122630")
+        KODEX_LEVERAGE_t1903.t1903_e.SetFieldData("t1903InBlock", "date", 0, "")
+        KODEX_LEVERAGE_t1903.t1903_e.Request(False)
+
+        while KODEX_LEVERAGE_t1903.tr_success == False:
+            pcom.PumpWaitingMessages()
+            time.sleep(0.1)
 
 if __name__ == "__main__":
     start = time.time()
