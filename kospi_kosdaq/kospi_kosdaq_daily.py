@@ -19,5 +19,10 @@ class EventClass_t1903:
             date = self.GetFieldData("t1903OutBlock", "date", 0)
             hname = self.GetFieldData("t1903OutBlock", "hname", 0)
             upname = self.GetFieldData("t1903OutBlock", "upname", 0)
-
+            for i in range(occurs_count):
+                inverse_idx = occurs_count - i - 1
+                date = self.GetFieldData("t1903OutBlock1", "date", inverse_idx)
+                price = self.GetFieldData("t1903OutBlock1", "price", inverse_idx)
+                print("date: {}".format(date))
+                print("price: {}".format(price))
 
