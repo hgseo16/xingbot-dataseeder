@@ -36,6 +36,7 @@ class EventClass_t1903:
     NAV전일대비 FLOAT NULL,
     추적오차 FLOAT NULL,
     괴리 FLOAT NULL,
+    지수 FLOAT NULL,
     지수전일대비 FLOAT NULL,
     지수전일대비율 FLOAT NULL)
     '''
@@ -68,40 +69,40 @@ class EventClass_t1903:
                 jichange = self.GetFieldData("t1903OutBlock1", "jichange", inverse_idx)
                 jirate = self.GetFieldData("t1903OutBlock1", "jirate", inverse_idx)
 
-            print("date: {}".format(type(date)))
-            print("price: {}".format(type(price)))
-            print("sign: {}".format(type(sign)))
-            print("change: {}".format(type(change)))
-            print("volume: {}".format(type(volume)))
-            print("navdiff: {}".format(type(navdiff)))
-            print("nav: {}".format(type(nav)))
-            print("navchange: {}".format(type(navchange)))
-            print("crate: {}".format(type(crate)))
-            print("grate: {}".format(type(grate)))
-            print("jisu: {}".format(type(jisu)))
-            print("jichange: {}".format(type(jichange)))
-            print("jirate: {}".format(type(jirate)))
+            # print("date: {}".format(type(date)))
+            # print("price: {}".format(type(price)))
+            # print("sign: {}".format(type(sign)))
+            # print("change: {}".format(type(change)))
+            # print("volume: {}".format(type(volume)))
+            # print("navdiff: {}".format(type(navdiff)))
+            # print("nav: {}".format(type(nav)))
+            # print("navchange: {}".format(type(navchange)))
+            # print("crate: {}".format(type(crate)))
+            # print("grate: {}".format(type(grate)))
+            # print("jisu: {}".format(type(jisu)))
+            # print("jichange: {}".format(type(jichange)))
+            # print("jirate: {}".format(type(jirate)))
 
 
-                # mysql_etf(date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate)
+                mysql_etf(date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate)
 
 
 def mysql_etf(date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate):
 
         # curs.execute('DROP DATABASE IF EXISTS SPY_500')
         # curs.execute('CREATE DATABASE SPY_500')
-        EventClass_t1903.conn.select_db('SPY_500')
+        EventClass_t1903.conn.select_db('KODEX_LEVERAGE')
         # curs.execute(sql_set_table_daily_data)
         sql_insert_daily_data = '''
-        INSERT INTO SPY_500_DAILY
-        (날짜, 시간, 시가, 고가, 저가, 가격, 
-        전일대비구분, 전일대비, 등락률, 누적거래량, 한국일자, 한국시간)
+        INSERT INTO KODEX_LEVERAGE_daily
+        (일자, 현재가, 전일대비구분, 전일대비, 누적거래량, NAV대비, 
+        NAV, NAV전일대비, 추적오차, 괴리, 지수, 지수전일대비, 지수전일대비율)
         VALUE
-        ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
-        '''.format(str(date), str(time), str(open), str(high), str(low), str(price), str(sign), str(change),
-                   str(uprate), str(volume), str(kodate), str(kotime))
+        ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
+        '''.format(str(date), str(price), str(sign), str(change), str(volume), str(navdiff), str(nav), str(navchange),
+                   str(crate), str(grate), str(jisu), str(jichange), str(jirate))
+        print(sql_insert_daily_data)
         EventClass_t1903.curs.execute(sql_insert_daily_data)
         EventClass_t1903.conn.commit()
-
 
 
