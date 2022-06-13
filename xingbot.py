@@ -66,13 +66,14 @@ class Main():
         KODEX_LEVERAGE_t1903 = EventClass_t1903
         KODEX_LEVERAGE_t1903.t1903_e = wc.DispatchWithEvents("XA_DataSet.XAQuery", KODEX_LEVERAGE_t1903)
         KODEX_LEVERAGE_t1903.t1903_e.ResFileName = "C:/eBEST/xingAPI/Res/t1903.res"
-        KODEX_LEVERAGE_t1903.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, "122630")
-        KODEX_LEVERAGE_t1903.t1903_e.SetFieldData("t1903InBlock", "date", 0, "")
-        KODEX_LEVERAGE_t1903.t1903_e.Request(False)
+        t1903_request(shcode="122630", date="")
+        # KODEX_LEVERAGE_t1903.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, "122630")
+        # KODEX_LEVERAGE_t1903.t1903_e.SetFieldData("t1903InBlock", "date", 0, "")
+        # KODEX_LEVERAGE_t1903.t1903_e.Request(False)
 
-        while KODEX_LEVERAGE_t1903.tr_success == False:
-            pcom.PumpWaitingMessages()
-            time.sleep(0.1)
+        # while KODEX_LEVERAGE_t1903.tr_success == False:
+        #     pcom.PumpWaitingMessages()
+        #     time.sleep(0.1)
 
 if __name__ == "__main__":
     start = time.time()

@@ -86,6 +86,24 @@ class EventClass_t1903:
 
                 mysql_etf(date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate)
 
+            if date != "":
+                t1903_request(shcode='122630', date=date, occurs=self.IsNext)
+            else:
+                EventClass_t1903.conn.close()
+                EventClass_t1903.tr_success = True
+
+
+def t1903_request(shcode=None, date=None, occurs=False):
+    timefnc.sleep(3.1)
+    EventClass_t1903.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, shcode)
+    EventClass_t1903.t1903_e.SetFieldData("t1903InBlock", "date", 0, date)
+
+    EventClass_t1903.t1903_e.Request(occurs)
+
+    EventClass_t1903.tr_success = False
+
+    while EventClass_t1903.tr_success == False:
+        pcom.PumpWaitingMessages()
 
 def mysql_etf(date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate):
 
