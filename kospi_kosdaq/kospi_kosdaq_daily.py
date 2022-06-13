@@ -50,7 +50,8 @@ class EventClass_t1903:
         if code == "t1903":
             print('ETF 일별추이 Called')
             occurs_count = self.GetBlockCount("t1903OutBlock1")
-            date = self.GetFieldData("t1903OutBlock", "date", 0)
+            cts_date = self.GetFieldData("t1903OutBlock", "date", 0)
+            print("CTS_DATE: {}".format(cts_date))
             hname = self.GetFieldData("t1903OutBlock", "hname", 0)
             upname = self.GetFieldData("t1903OutBlock", "upname", 0)
             for i in range(occurs_count):
@@ -86,8 +87,8 @@ class EventClass_t1903:
 
                 mysql_etf(date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate)
 
-            if date != "":
-                t1903_request(shcode='122630', date=date, occurs=self.IsNext)
+            if cts_date != "":
+                t1903_request(shcode='122630', date=cts_date, occurs=self.IsNext)
             else:
                 EventClass_t1903.conn.close()
                 EventClass_t1903.tr_success = True
@@ -97,6 +98,7 @@ def t1903_request(shcode=None, date=None, occurs=False):
     timefnc.sleep(3.1)
     EventClass_t1903.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, shcode)
     EventClass_t1903.t1903_e.SetFieldData("t1903InBlock", "date", 0, date)
+    print("Inserted Date: {}".format(date))
 
     EventClass_t1903.t1903_e.Request(occurs)
 
@@ -119,7 +121,6 @@ def mysql_etf(date, price, sign, change, volume, navdiff, nav, navchange, crate,
         ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
         '''.format(str(date), str(price), str(sign), str(change), str(volume), str(navdiff), str(nav), str(navchange),
                    str(crate), str(grate), str(jisu), str(jichange), str(jirate))
-        print(sql_insert_daily_data)
         EventClass_t1903.curs.execute(sql_insert_daily_data)
         EventClass_t1903.conn.commit()
 
