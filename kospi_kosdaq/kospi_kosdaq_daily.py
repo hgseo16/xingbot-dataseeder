@@ -5,7 +5,10 @@ import pymysql
 import os
 from dotenv import load_dotenv
 
-class EventClass_t1903:
+import sys
+sys.setrecursionlimit(1500)
+
+class EC_t1903_122630:
     # Used to check tr status
     tr_success = False
     # Used for methods
@@ -90,28 +93,28 @@ class EventClass_t1903:
             if cts_date != "":
                 t1903_request(shcode='122630', date=cts_date, occurs=self.IsNext)
             else:
-                EventClass_t1903.conn.close()
-                EventClass_t1903.tr_success = True
+                EC_t1903_122630.conn.close()
+                EC_t1903_122630.tr_success = True
 
 
 def t1903_request(shcode=None, date=None, occurs=False):
     timefnc.sleep(3.1)
-    EventClass_t1903.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, shcode)
-    EventClass_t1903.t1903_e.SetFieldData("t1903InBlock", "date", 0, date)
+    EC_t1903_122630.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, shcode)
+    EC_t1903_122630.t1903_e.SetFieldData("t1903InBlock", "date", 0, date)
     print("Inserted Date: {}".format(date))
 
-    EventClass_t1903.t1903_e.Request(occurs)
+    EC_t1903_122630.t1903_e.Request(occurs)
 
-    EventClass_t1903.tr_success = False
+    EC_t1903_122630.tr_success = False
 
-    while EventClass_t1903.tr_success == False:
+    while EC_t1903_122630.tr_success == False:
         pcom.PumpWaitingMessages()
 
 def mysql_etf(date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate):
 
         # curs.execute('DROP DATABASE IF EXISTS SPY_500')
         # curs.execute('CREATE DATABASE SPY_500')
-        EventClass_t1903.conn.select_db('KODEX_LEVERAGE')
+        EC_t1903_122630.conn.select_db('KODEX_LEVERAGE')
         # curs.execute(sql_set_table_daily_data)
         sql_insert_daily_data = '''
         INSERT INTO KODEX_LEVERAGE_daily
@@ -121,7 +124,7 @@ def mysql_etf(date, price, sign, change, volume, navdiff, nav, navchange, crate,
         ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
         '''.format(str(date), str(price), str(sign), str(change), str(volume), str(navdiff), str(nav), str(navchange),
                    str(crate), str(grate), str(jisu), str(jichange), str(jirate))
-        EventClass_t1903.curs.execute(sql_insert_daily_data)
-        EventClass_t1903.conn.commit()
+        EC_t1903_122630.curs.execute(sql_insert_daily_data)
+        EC_t1903_122630.conn.commit()
 
 
