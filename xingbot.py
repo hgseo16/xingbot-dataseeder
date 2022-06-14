@@ -63,7 +63,7 @@ class Main():
 
         # Implement calling for ETF data
         # KODEX 레버리지 (122630)
-        KODEX_LEVERAGE_t1903 = EventClass_t1903_122630
+        KODEX_LEVERAGE_t1903 = EC_t1903_122630
         KODEX_LEVERAGE_t1903.t1903_e = wc.DispatchWithEvents("XA_DataSet.XAQuery", KODEX_LEVERAGE_t1903)
         KODEX_LEVERAGE_t1903.t1903_e.ResFileName = "C:/eBEST/xingAPI/Res/t1903.res"
         t1903_request(shcode="122630", date="")
