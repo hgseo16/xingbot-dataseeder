@@ -19,11 +19,14 @@ class EC_t1903:
 
     time_frame = ''
 
+    counter = 1
+
     def OnReceiveData(self, code):
 
         if code == "t1903":
             occurs_count = self.GetBlockCount("t1903OutBlock1")
             cts_date = self.GetFieldData("t1903OutBlock", "date", 0)
+            print('cts_date: {}'.format(cts_date))
             # 종목명
             hname = self.GetFieldData("t1903OutBlock", "hname", 0)
             hname = hname.replace(" ", "_")
@@ -106,8 +109,15 @@ def mysql_etf(hname, time_frame, date, price, sign, change, volume, navdiff, nav
         ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
         '''.format(time_frame, str(date), str(price), str(sign), str(change), str(volume), str(navdiff), str(nav), str(navchange),
                    str(crate), str(grate), str(jisu), str(jichange), str(jirate))
+        print('---{}---'.format(EC_t1903.counter))
+        print(sql_insert_daily_data)
+        print('1')
         EC_t1903.curs.execute(sql_insert_daily_data)
+        print('2')
         EC_t1903.conn.commit()
+        print('3')
+        EC_t1903.counter+=1
+        print('------')
 
 
 def initialize_db(hname, time_frame):
