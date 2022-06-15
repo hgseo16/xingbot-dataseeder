@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import sys
 sys.setrecursionlimit(1500)
 
-class EC_t1903_122630:
+class EC_t1903:
     # Used to check tr status
     tr_success = False
     # Used for methods
@@ -71,24 +71,24 @@ class EC_t1903_122630:
             if cts_date != "":
                 t1903_request(shcode='122630', date=cts_date, time_frame=self.time_frame, occurs=self.IsNext)
             else:
-                EC_t1903_122630.conn.close()
-                EC_t1903_122630.tr_success = True
+                EC_t1903.conn.close()
+                EC_t1903.tr_success = True
 
 
 def t1903_request(shcode=None, date=None, time_frame='', occurs=False):
     timefnc.sleep(3.1)
     # Pass time_frame (daily, 1min, 3min, etc) to method
-    if EC_t1903_122630.first_loop == True:
-        EC_t1903_122630.time_frame = time_frame
+    if EC_t1903.first_loop == True:
+        EC_t1903.time_frame = time_frame
 
-    EC_t1903_122630.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, shcode)
-    EC_t1903_122630.t1903_e.SetFieldData("t1903InBlock", "date", 0, date)
+    EC_t1903.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, shcode)
+    EC_t1903.t1903_e.SetFieldData("t1903InBlock", "date", 0, date)
 
-    EC_t1903_122630.t1903_e.Request(occurs)
+    EC_t1903.t1903_e.Request(occurs)
 
-    EC_t1903_122630.tr_success = False
+    EC_t1903.tr_success = False
 
-    while EC_t1903_122630.tr_success == False:
+    while EC_t1903.tr_success == False:
         pcom.PumpWaitingMessages()
 
 
@@ -96,7 +96,7 @@ def mysql_etf(hname, time_frame, date, price, sign, change, volume, navdiff, nav
 
         # curs.execute('DROP DATABASE IF EXISTS SPY_500')
         # curs.execute('CREATE DATABASE SPY_500')
-        EC_t1903_122630.conn.select_db('{}'.format(hname))
+        EC_t1903.conn.select_db('{}'.format(hname))
         # curs.execute(sql_set_table_daily_data)
         sql_insert_daily_data = '''
         INSERT INTO {}
@@ -106,8 +106,8 @@ def mysql_etf(hname, time_frame, date, price, sign, change, volume, navdiff, nav
         ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
         '''.format(time_frame, str(date), str(price), str(sign), str(change), str(volume), str(navdiff), str(nav), str(navchange),
                    str(crate), str(grate), str(jisu), str(jichange), str(jirate))
-        EC_t1903_122630.curs.execute(sql_insert_daily_data)
-        EC_t1903_122630.conn.commit()
+        EC_t1903.curs.execute(sql_insert_daily_data)
+        EC_t1903.conn.commit()
 
 
 def initialize_db(hname, time_frame):
@@ -116,20 +116,20 @@ def initialize_db(hname, time_frame):
 
     AUTHENTICATION_PASSWORD = os.environ.get('AUTHENTICATION_PASSWORD')
 
-    EC_t1903_122630.conn = pymysql.connect(host='127.0.0.1', user='root', password=AUTHENTICATION_PASSWORD, charset='utf8')
+    EC_t1903.conn = pymysql.connect(host='127.0.0.1', user='root', password=AUTHENTICATION_PASSWORD, charset='utf8')
 
-    EC_t1903_122630.curs = EC_t1903_122630.conn.cursor()
+    EC_t1903.curs = EC_t1903.conn.cursor()
 
     # For Deleting and Recreating db spy_500
     # curs.execute('DROP DATABASE IF EXISTS KODEX_LEVERAGE')
 
     # to check if db exists
-    EC_t1903_122630.curs.execute("SHOW DATABASES LIKE '{}'".format(hname))
-    db_check = EC_t1903_122630.curs.fetchall()
+    EC_t1903.curs.execute("SHOW DATABASES LIKE '{}'".format(hname))
+    db_check = EC_t1903.curs.fetchall()
 
     if db_check == (): # db doesn't exist
-        EC_t1903_122630.curs.execute("CREATE DATABASE `{}`".format(hname))
-        EC_t1903_122630.conn.select_db("{}".format(hname))
+        EC_t1903.curs.execute("CREATE DATABASE `{}`".format(hname))
+        EC_t1903.conn.select_db("{}".format(hname))
         sql_set_table_daily_data = '''
         CREATE TABLE `{}`
         (일자 VARCHAR(30) NOT NULL PRIMARY KEY,
@@ -146,8 +146,8 @@ def initialize_db(hname, time_frame):
         지수전일대비 FLOAT NULL,
         지수전일대비율 FLOAT NULL)
         '''.format(time_frame)
-        EC_t1903_122630.curs.execute(sql_set_table_daily_data)
-        EC_t1903_122630.conn.select_db("{}".format(hname))
-        EC_t1903_122630.conn.commit()
+        EC_t1903.curs.execute(sql_set_table_daily_data)
+        EC_t1903.conn.select_db("{}".format(hname))
+        EC_t1903.conn.commit()
     else: # db exist
-        EC_t1903_122630.conn.select_db("{}".format(hname))
+        EC_t1903.conn.select_db("{}".format(hname))
