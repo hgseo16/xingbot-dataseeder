@@ -14,61 +14,27 @@ class EC_t1903_122630:
     # Used for methods
     t1903_e = None
 
-    initialized = False
+    # Initialize DB selection or creation in first loop
+    first_loop = True
 
-    load_dotenv()
-
-    AUTHENTICATION_PASSWORD = os.environ.get('AUTHENTICATION_PASSWORD')
-
-    conn = pymysql.connect(host='127.0.0.1', user='root', password=AUTHENTICATION_PASSWORD, charset='utf8')
-
-    curs = conn.cursor()
-
-    # For Deleting and Recreating db spy_500
-    # curs.execute('DROP DATABASE IF EXISTS KODEX_LEVERAGE')
-
-    # to check if db exists
-    curs.execute("SHOW DATABASES LIKE 'kodex_leverage'")
-    db_check = curs.fetchall()
-
-    if db_check == (): # db doesn't exist
-        print('db doesn\'t exist')
-        curs.execute('CREATE DATABASE KODEX_LEVERAGE')
-        conn.select_db('KODEX_LEVERAGE')
-        sql_set_table_daily_data = '''
-        CREATE TABLE KODEX_LEVERAGE_daily
-        (일자 VARCHAR(30) NOT NULL PRIMARY KEY,
-        현재가 FLOAT NULL,
-        전일대비구분 FLOAT NULL,
-        전일대비 FLOAT NULL,
-        누적거래량 FLOAT NULL,
-        NAV대비 FLOAT NULL,
-        NAV FLOAT NULL,
-        NAV전일대비 FLOAT NULL,
-        추적오차 FLOAT NULL,
-        괴리 FLOAT NULL,
-        지수 FLOAT NULL,
-        지수전일대비 FLOAT NULL,
-        지수전일대비율 FLOAT NULL)
-        '''
-        curs.execute(sql_set_table_daily_data)
-        conn.select_db('KODEX_LEVERAGE')
-        conn.commit()
-    else: # db exist
-        print('db exist')
-        conn.select_db('KODEX_LEVERAGE')
-
+    time_frame = ''
 
     def OnReceiveData(self, code):
-        print("OnReceiveData")
 
         if code == "t1903":
-            print('ETF 일별추이 Called')
             occurs_count = self.GetBlockCount("t1903OutBlock1")
             cts_date = self.GetFieldData("t1903OutBlock", "date", 0)
-            print("CTS_DATE: {}".format(cts_date))
+            # 종목명
             hname = self.GetFieldData("t1903OutBlock", "hname", 0)
+            hname = hname.replace(" ", "_")
+            # 업종지수명
             upname = self.GetFieldData("t1903OutBlock", "upname", 0)
+
+
+            if self.first_loop == True:
+                initialize_db(hname, self.time_frame)
+                self.first_loop = False
+
             for i in range(occurs_count):
                 inverse_idx = occurs_count - i - 1
                 date = self.GetFieldData("t1903OutBlock1", "date", inverse_idx)
@@ -100,20 +66,23 @@ class EC_t1903_122630:
             # print("jirate: {}".format(type(jirate)))
 
 
-                mysql_etf(date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate)
+                mysql_etf(hname, self.time_frame, date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate)
 
             if cts_date != "":
-                t1903_request(shcode='122630', date=cts_date, occurs=self.IsNext)
+                t1903_request(shcode='122630', date=cts_date, time_frame=self.time_frame, occurs=self.IsNext)
             else:
                 EC_t1903_122630.conn.close()
                 EC_t1903_122630.tr_success = True
 
 
-def t1903_request(shcode=None, date=None, occurs=False):
+def t1903_request(shcode=None, date=None, time_frame='', occurs=False):
     timefnc.sleep(3.1)
+    # Pass time_frame (daily, 1min, 3min, etc) to method
+    if EC_t1903_122630.first_loop == True:
+        EC_t1903_122630.time_frame = time_frame
+
     EC_t1903_122630.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, shcode)
     EC_t1903_122630.t1903_e.SetFieldData("t1903InBlock", "date", 0, date)
-    print("Inserted Date: {}".format(date))
 
     EC_t1903_122630.t1903_e.Request(occurs)
 
@@ -123,54 +92,62 @@ def t1903_request(shcode=None, date=None, occurs=False):
         pcom.PumpWaitingMessages()
 
 
-def mysql_etf(date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate):
+def mysql_etf(hname, time_frame, date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate):
 
         # curs.execute('DROP DATABASE IF EXISTS SPY_500')
         # curs.execute('CREATE DATABASE SPY_500')
-        EC_t1903_122630.conn.select_db('KODEX_LEVERAGE')
+        EC_t1903_122630.conn.select_db('{}'.format(hname))
         # curs.execute(sql_set_table_daily_data)
         sql_insert_daily_data = '''
-        INSERT INTO KODEX_LEVERAGE_daily
+        INSERT INTO {}
         (일자, 현재가, 전일대비구분, 전일대비, 누적거래량, NAV대비, 
         NAV, NAV전일대비, 추적오차, 괴리, 지수, 지수전일대비, 지수전일대비율)
         VALUE
         ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
-        '''.format(str(date), str(price), str(sign), str(change), str(volume), str(navdiff), str(nav), str(navchange),
+        '''.format(time_frame, str(date), str(price), str(sign), str(change), str(volume), str(navdiff), str(nav), str(navchange),
                    str(crate), str(grate), str(jisu), str(jichange), str(jirate))
         EC_t1903_122630.curs.execute(sql_insert_daily_data)
         EC_t1903_122630.conn.commit()
 
 
-def initialize_db():
+def initialize_db(hname, time_frame):
 
     load_dotenv()
 
     AUTHENTICATION_PASSWORD = os.environ.get('AUTHENTICATION_PASSWORD')
 
-    conn = pymysql.connect(host='127.0.0.1', user='root', password=AUTHENTICATION_PASSWORD, charset='utf8')
+    EC_t1903_122630.conn = pymysql.connect(host='127.0.0.1', user='root', password=AUTHENTICATION_PASSWORD, charset='utf8')
 
-    curs = conn.cursor()
+    EC_t1903_122630.curs = EC_t1903_122630.conn.cursor()
 
     # For Deleting and Recreating db spy_500
-    curs.execute('DROP DATABASE IF EXISTS KODEX_LEVERAGE')
-    curs.execute('CREATE DATABASE KODEX_LEVERAGE')
-    conn.select_db('KODEX_LEVERAGE')
+    # curs.execute('DROP DATABASE IF EXISTS KODEX_LEVERAGE')
 
-    sql_set_table_daily_data = '''
-    CREATE TABLE KODEX_LEVERAGE_daily
-    (일자 VARCHAR(30) NOT NULL PRIMARY KEY,
-    현재가 FLOAT NULL,
-    전일대비구분 FLOAT NULL,
-    전일대비 FLOAT NULL,
-    누적거래량 FLOAT NULL,
-    NAV대비 FLOAT NULL,
-    NAV FLOAT NULL,
-    NAV전일대비 FLOAT NULL,
-    추적오차 FLOAT NULL,
-    괴리 FLOAT NULL,
-    지수 FLOAT NULL,
-    지수전일대비 FLOAT NULL,
-    지수전일대비율 FLOAT NULL)
-    '''
-    curs.execute(sql_set_table_daily_data)
-    conn.commit()
+    # to check if db exists
+    EC_t1903_122630.curs.execute("SHOW DATABASES LIKE '{}'".format(hname))
+    db_check = EC_t1903_122630.curs.fetchall()
+
+    if db_check == (): # db doesn't exist
+        EC_t1903_122630.curs.execute("CREATE DATABASE `{}`".format(hname))
+        EC_t1903_122630.conn.select_db("{}".format(hname))
+        sql_set_table_daily_data = '''
+        CREATE TABLE `{}`
+        (일자 VARCHAR(30) NOT NULL PRIMARY KEY,
+        현재가 FLOAT NULL,
+        전일대비구분 FLOAT NULL,
+        전일대비 FLOAT NULL,
+        누적거래량 FLOAT NULL,
+        NAV대비 FLOAT NULL,
+        NAV FLOAT NULL,
+        NAV전일대비 FLOAT NULL,
+        추적오차 FLOAT NULL,
+        괴리 FLOAT NULL,
+        지수 FLOAT NULL,
+        지수전일대비 FLOAT NULL,
+        지수전일대비율 FLOAT NULL)
+        '''.format(time_frame)
+        EC_t1903_122630.curs.execute(sql_set_table_daily_data)
+        EC_t1903_122630.conn.select_db("{}".format(hname))
+        EC_t1903_122630.conn.commit()
+    else: # db exist
+        EC_t1903_122630.conn.select_db("{}".format(hname))
