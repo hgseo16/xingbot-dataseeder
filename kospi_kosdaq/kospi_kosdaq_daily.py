@@ -14,6 +14,8 @@ class EC_t1903_122630:
     # Used for methods
     t1903_e = None
 
+    initialized = False
+
     load_dotenv()
 
     AUTHENTICATION_PASSWORD = os.environ.get('AUTHENTICATION_PASSWORD')
@@ -23,28 +25,38 @@ class EC_t1903_122630:
     curs = conn.cursor()
 
     # For Deleting and Recreating db spy_500
-    curs.execute('DROP DATABASE IF EXISTS KODEX_LEVERAGE')
-    curs.execute('CREATE DATABASE KODEX_LEVERAGE')
-    conn.select_db('KODEX_LEVERAGE')
+    # curs.execute('DROP DATABASE IF EXISTS KODEX_LEVERAGE')
 
-    sql_set_table_daily_data = '''
-    CREATE TABLE KODEX_LEVERAGE_daily
-    (일자 VARCHAR(30) NOT NULL PRIMARY KEY,
-    현재가 FLOAT NULL,
-    전일대비구분 FLOAT NULL,
-    전일대비 FLOAT NULL,
-    누적거래량 FLOAT NULL,
-    NAV대비 FLOAT NULL,
-    NAV FLOAT NULL,
-    NAV전일대비 FLOAT NULL,
-    추적오차 FLOAT NULL,
-    괴리 FLOAT NULL,
-    지수 FLOAT NULL,
-    지수전일대비 FLOAT NULL,
-    지수전일대비율 FLOAT NULL)
-    '''
-    curs.execute(sql_set_table_daily_data)
-    conn.commit()
+    # to check if db exists
+    curs.execute("SHOW DATABASES LIKE 'kodex_leverage'")
+    db_check = curs.fetchall()
+
+    if db_check == (): # db doesn't exist
+        print('db doesn\'t exist')
+        curs.execute('CREATE DATABASE KODEX_LEVERAGE')
+        conn.select_db('KODEX_LEVERAGE')
+        sql_set_table_daily_data = '''
+        CREATE TABLE KODEX_LEVERAGE_daily
+        (일자 VARCHAR(30) NOT NULL PRIMARY KEY,
+        현재가 FLOAT NULL,
+        전일대비구분 FLOAT NULL,
+        전일대비 FLOAT NULL,
+        누적거래량 FLOAT NULL,
+        NAV대비 FLOAT NULL,
+        NAV FLOAT NULL,
+        NAV전일대비 FLOAT NULL,
+        추적오차 FLOAT NULL,
+        괴리 FLOAT NULL,
+        지수 FLOAT NULL,
+        지수전일대비 FLOAT NULL,
+        지수전일대비율 FLOAT NULL)
+        '''
+        curs.execute(sql_set_table_daily_data)
+        conn.select_db('KODEX_LEVERAGE')
+        conn.commit()
+    else: # db exist
+        print('db exist')
+        conn.select_db('KODEX_LEVERAGE')
 
 
     def OnReceiveData(self, code):
@@ -110,6 +122,7 @@ def t1903_request(shcode=None, date=None, occurs=False):
     while EC_t1903_122630.tr_success == False:
         pcom.PumpWaitingMessages()
 
+
 def mysql_etf(date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate):
 
         # curs.execute('DROP DATABASE IF EXISTS SPY_500')
@@ -128,3 +141,36 @@ def mysql_etf(date, price, sign, change, volume, navdiff, nav, navchange, crate,
         EC_t1903_122630.conn.commit()
 
 
+def initialize_db():
+
+    load_dotenv()
+
+    AUTHENTICATION_PASSWORD = os.environ.get('AUTHENTICATION_PASSWORD')
+
+    conn = pymysql.connect(host='127.0.0.1', user='root', password=AUTHENTICATION_PASSWORD, charset='utf8')
+
+    curs = conn.cursor()
+
+    # For Deleting and Recreating db spy_500
+    curs.execute('DROP DATABASE IF EXISTS KODEX_LEVERAGE')
+    curs.execute('CREATE DATABASE KODEX_LEVERAGE')
+    conn.select_db('KODEX_LEVERAGE')
+
+    sql_set_table_daily_data = '''
+    CREATE TABLE KODEX_LEVERAGE_daily
+    (일자 VARCHAR(30) NOT NULL PRIMARY KEY,
+    현재가 FLOAT NULL,
+    전일대비구분 FLOAT NULL,
+    전일대비 FLOAT NULL,
+    누적거래량 FLOAT NULL,
+    NAV대비 FLOAT NULL,
+    NAV FLOAT NULL,
+    NAV전일대비 FLOAT NULL,
+    추적오차 FLOAT NULL,
+    괴리 FLOAT NULL,
+    지수 FLOAT NULL,
+    지수전일대비 FLOAT NULL,
+    지수전일대비율 FLOAT NULL)
+    '''
+    curs.execute(sql_set_table_daily_data)
+    conn.commit()
