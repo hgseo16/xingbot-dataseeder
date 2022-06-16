@@ -93,7 +93,7 @@ class EC_t1903:
                 EC_t1903.tr_success = True
 
 
-def t1903_request(shcode=None, date=None, time_frame='', first_seed=True, occurs=False):
+def t1903_request(shcode=None, date=None, time_frame='', seeded=True, occurs=True):
     timefnc.sleep(3.1)
 
     # Pass time_frame (daily, 1min, 3min, etc) to method
