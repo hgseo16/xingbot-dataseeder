@@ -68,6 +68,15 @@ class EC_t1903:
             # print("jichange: {}".format(type(jichange)))
             # print("jirate: {}".format(type(jirate)))
 
+                # TEST
+                if self.counter > 2:
+                    check_if_exist = '''
+                   SELECT * FROM daily
+                   WHERE 일자 = 20220418
+                   '''
+                    EC_t1903.curs.execute(check_if_exist)
+                    print(EC_t1903.curs.fetchall())
+                #
 
                 mysql_etf(hname, self.time_frame, date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate)
 
@@ -101,6 +110,17 @@ def mysql_etf(hname, time_frame, date, price, sign, change, volume, navdiff, nav
         # curs.execute('CREATE DATABASE SPY_500')
         EC_t1903.conn.select_db('{}'.format(hname))
         # curs.execute(sql_set_table_daily_data)
+
+        # Check
+        EC_t1903.conn.select_db('{}'.format(hname))
+        check_if_exist = '''
+        SELECT * FROM daily
+        WHERE 일자 = 20220418
+        '''
+        EC_t1903.curs.execute(check_if_exist)
+        print(EC_t1903.curs.fetchall())
+        #
+
         sql_insert_daily_data = '''
         INSERT INTO {}
         (일자, 현재가, 전일대비구분, 전일대비, 누적거래량, NAV대비, 
@@ -110,12 +130,15 @@ def mysql_etf(hname, time_frame, date, price, sign, change, volume, navdiff, nav
         '''.format(time_frame, str(date), str(price), str(sign), str(change), str(volume), str(navdiff), str(nav), str(navchange),
                    str(crate), str(grate), str(jisu), str(jichange), str(jirate))
         print('---{}---'.format(EC_t1903.counter))
+
         print(sql_insert_daily_data)
         print('1')
         EC_t1903.curs.execute(sql_insert_daily_data)
         print('2')
         EC_t1903.conn.commit()
         print('3')
+        print(sql_insert_daily_data)
+
         EC_t1903.counter+=1
         print('------')
 
@@ -140,6 +163,23 @@ def initialize_db(hname, time_frame):
     if db_check == (): # db doesn't exist
         EC_t1903.curs.execute("CREATE DATABASE `{}`".format(hname))
         EC_t1903.conn.select_db("{}".format(hname))
+        # sql_set_table_daily_data = '''
+        # CREATE TABLE `{}`
+        # (일자 VARCHAR(30) NOT NULL PRIMARY KEY,
+        # 현재가 FLOAT NULL,
+        # 전일대비구분 FLOAT NULL,
+        # 전일대비 FLOAT NULL,
+        # 누적거래량 FLOAT NULL,
+        # NAV대비 FLOAT NULL,
+        # NAV FLOAT NULL,
+        # NAV전일대비 FLOAT NULL,
+        # 추적오차 FLOAT NULL,
+        # 괴리 FLOAT NULL,
+        # 지수 FLOAT NULL,
+        # 지수전일대비 FLOAT NULL,
+        # 지수전일대비율 FLOAT NULL)
+        # '''.format(time_frame)
+
         sql_set_table_daily_data = '''
         CREATE TABLE `{}`
         (일자 VARCHAR(30) NOT NULL PRIMARY KEY,
@@ -160,4 +200,30 @@ def initialize_db(hname, time_frame):
         EC_t1903.conn.select_db("{}".format(hname))
         EC_t1903.conn.commit()
     else: # db exist
+        # TEST
+        EC_t1903.curs.execute('DROP DATABASE IF EXISTS {}'.format(hname))
+        EC_t1903.curs.execute('CREATE DATABASE {}'.format(hname))
+        #
+
         EC_t1903.conn.select_db("{}".format(hname))
+
+        # TEST
+        sql_set_table_daily_data = '''
+        CREATE TABLE `{}`
+        (일자 VARCHAR(30) NOT NULL PRIMARY KEY,
+        현재가 FLOAT NULL,
+        전일대비구분 FLOAT NULL,
+        전일대비 FLOAT NULL,
+        누적거래량 FLOAT NULL,
+        NAV대비 FLOAT NULL,
+        NAV FLOAT NULL,
+        NAV전일대비 FLOAT NULL,
+        추적오차 FLOAT NULL,
+        괴리 FLOAT NULL,
+        지수 FLOAT NULL,
+        지수전일대비 FLOAT NULL,
+        지수전일대비율 FLOAT NULL)
+        '''.format(time_frame)
+        EC_t1903.curs.execute(sql_set_table_daily_data)
+        EC_t1903.conn.commit()
+        #
