@@ -94,13 +94,18 @@ class EC_t1903:
 
 
 def t1903_request(shcode=None, date=None, time_frame='', seeded=True, occurs=True):
+
+    # Temp: so that it destroy data
+    if seeded == False:
+        return
+
     timefnc.sleep(3.1)
 
     # Pass time_frame (daily, 1min, 3min, etc) to method
     if EC_t1903.first_loop == True:
         EC_t1903.time_frame = time_frame
 
-    EC_t1903.first_seed=first_seed
+    EC_t1903.seeded=seeded
 
     EC_t1903.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, shcode)
     EC_t1903.t1903_e.SetFieldData("t1903InBlock", "date", 0, date)
