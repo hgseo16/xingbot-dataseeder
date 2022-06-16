@@ -17,6 +17,9 @@ class EC_t1903:
     # Initialize DB selection or creation in first loop
     first_loop = True
 
+    # store shcode
+    shcode = ''
+
     time_frame = ''
 
     counter = 1
@@ -31,12 +34,14 @@ class EC_t1903:
             hname = self.GetFieldData("t1903OutBlock", "hname", 0)
             hname = hname.replace(" ", "_")
             # 업종지수명
-            upname = self.GetFieldData("t1903OutBlock", "upname", 0)
-
+            # upname = self.GetFieldData("t1903OutBlock", "upname", 0)
 
             if self.first_loop == True:
+
                 initialize_db(hname, self.time_frame)
                 self.first_loop = False
+
+            print('first loop done')
 
             for i in range(occurs_count):
                 inverse_idx = occurs_count - i - 1
@@ -69,19 +74,20 @@ class EC_t1903:
             # print("jirate: {}".format(type(jirate)))
 
                 # TEST
-                if self.counter > 2:
-                    check_if_exist = '''
-                   SELECT * FROM daily
-                   WHERE 일자 = 20220418
-                   '''
-                    EC_t1903.curs.execute(check_if_exist)
-                    print(EC_t1903.curs.fetchall())
+                # if self.counter > 2:
+                #     check_if_exist = '''
+                #    SELECT * FROM daily
+                #    WHERE 일자 = 20220418
+                #    '''
+                #     EC_t1903.curs.execute(check_if_exist)
+                #     print(EC_t1903.curs.fetchall())
                 #
+
 
                 mysql_etf(hname, self.time_frame, date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate)
 
             if cts_date != "":
-                t1903_request(shcode='122630', date=cts_date, time_frame=self.time_frame, occurs=self.IsNext)
+                t1903_request(shcode=EC_t1903.shcode, date=cts_date, time_frame=self.time_frame, occurs=self.IsNext)
             else:
                 EC_t1903.conn.close()
                 EC_t1903.tr_success = True
@@ -89,16 +95,21 @@ class EC_t1903:
 
 def t1903_request(shcode=None, date=None, time_frame='', occurs=False):
     timefnc.sleep(3.1)
+
     # Pass time_frame (daily, 1min, 3min, etc) to method
     if EC_t1903.first_loop == True:
         EC_t1903.time_frame = time_frame
 
+    # TEST
+    print(shcode)
+    #
+
     EC_t1903.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, shcode)
     EC_t1903.t1903_e.SetFieldData("t1903InBlock", "date", 0, date)
-
     EC_t1903.t1903_e.Request(occurs)
 
     EC_t1903.tr_success = False
+    EC_t1903.shcode = shcode
 
     while EC_t1903.tr_success == False:
         pcom.PumpWaitingMessages()
@@ -111,15 +122,7 @@ def mysql_etf(hname, time_frame, date, price, sign, change, volume, navdiff, nav
         EC_t1903.conn.select_db('{}'.format(hname))
         # curs.execute(sql_set_table_daily_data)
 
-        # Check
-        EC_t1903.conn.select_db('{}'.format(hname))
-        check_if_exist = '''
-        SELECT * FROM daily
-        WHERE 일자 = 20220418
-        '''
-        EC_t1903.curs.execute(check_if_exist)
-        print(EC_t1903.curs.fetchall())
-        #
+        print(hname)
 
         sql_insert_daily_data = '''
         INSERT INTO {}
@@ -129,18 +132,12 @@ def mysql_etf(hname, time_frame, date, price, sign, change, volume, navdiff, nav
         ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
         '''.format(time_frame, str(date), str(price), str(sign), str(change), str(volume), str(navdiff), str(nav), str(navchange),
                    str(crate), str(grate), str(jisu), str(jichange), str(jirate))
-        print('---{}---'.format(EC_t1903.counter))
 
         print(sql_insert_daily_data)
-        print('1')
         EC_t1903.curs.execute(sql_insert_daily_data)
-        print('2')
         EC_t1903.conn.commit()
-        print('3')
-        print(sql_insert_daily_data)
 
         EC_t1903.counter+=1
-        print('------')
 
 
 def initialize_db(hname, time_frame):
@@ -160,7 +157,9 @@ def initialize_db(hname, time_frame):
     EC_t1903.curs.execute("SHOW DATABASES LIKE '{}'".format(hname))
     db_check = EC_t1903.curs.fetchall()
 
+
     if db_check == (): # db doesn't exist
+        print('db doesn\'t exist')
         EC_t1903.curs.execute("CREATE DATABASE `{}`".format(hname))
         EC_t1903.conn.select_db("{}".format(hname))
         # sql_set_table_daily_data = '''
@@ -202,7 +201,9 @@ def initialize_db(hname, time_frame):
     else: # db exist
         # TEST
         EC_t1903.curs.execute('DROP DATABASE IF EXISTS {}'.format(hname))
+        print(hname)
         EC_t1903.curs.execute('CREATE DATABASE {}'.format(hname))
+        print('CREATE DATABASE {}'.format(hname))
         #
 
         EC_t1903.conn.select_db("{}".format(hname))
