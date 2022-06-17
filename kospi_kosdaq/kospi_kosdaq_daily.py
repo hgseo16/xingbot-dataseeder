@@ -97,6 +97,7 @@ def t1903_request(shcode=None, date=None, time_frame='', seeded=True, occurs=Tru
 
     # Temp: so that it destroy data
     if seeded == False:
+        # Should do what it's currently doing RN
         return
 
     timefnc.sleep(3.1)
