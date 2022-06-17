@@ -95,28 +95,29 @@ class EC_t1903:
 
 def t1903_request(shcode=None, date=None, time_frame='', seeded=True, market='', occurs=True):
 
-    # Temp: so that it destroy data
     if seeded == False:
         # Should do what it's currently doing RN
-        return
+        print('first time seeding')
+        timefnc.sleep(3.1)
 
-    timefnc.sleep(3.1)
+        # Pass time_frame (daily, 1min, 3min, etc) to method
+        if EC_t1903.first_loop == True:
+            EC_t1903.time_frame = time_frame
 
-    # Pass time_frame (daily, 1min, 3min, etc) to method
-    if EC_t1903.first_loop == True:
-        EC_t1903.time_frame = time_frame
+        EC_t1903.seeded = seeded
 
-    EC_t1903.seeded=seeded
+        EC_t1903.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, shcode)
+        EC_t1903.t1903_e.SetFieldData("t1903InBlock", "date", 0, date)
+        EC_t1903.t1903_e.Request(occurs)
 
-    EC_t1903.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, shcode)
-    EC_t1903.t1903_e.SetFieldData("t1903InBlock", "date", 0, date)
-    EC_t1903.t1903_e.Request(occurs)
+        EC_t1903.tr_success = False
+        EC_t1903.shcode = shcode
 
-    EC_t1903.tr_success = False
-    EC_t1903.shcode = shcode
-
-    while EC_t1903.tr_success == False:
-        pcom.PumpWaitingMessages()
+        while EC_t1903.tr_success == False:
+            pcom.PumpWaitingMessages()
+    else:
+        print('already seeded so only need to update')
+        # Call the most recent 'date' row  and update the rows after that date
 
 
 def mysql_etf(hname, time_frame, date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate):
