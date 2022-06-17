@@ -93,7 +93,7 @@ class EC_t1903:
                 EC_t1903.tr_success = True
 
 
-def t1903_request(shcode=None, date=None, time_frame='', seeded=True, occurs=True):
+def t1903_request(shcode=None, date=None, time_frame='', seeded=True, market='', occurs=True):
 
     # Temp: so that it destroy data
     if seeded == False:
