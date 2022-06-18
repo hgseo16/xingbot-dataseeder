@@ -211,10 +211,10 @@ def initialize_db(hname, time_frame):
         EC_t1903.conn.commit()
     else: # db exist
         # TEST
-        EC_t1903.curs.execute('DROP DATABASE IF EXISTS {}'.format(hname))
-        print(hname)
-        EC_t1903.curs.execute('CREATE DATABASE {}'.format(hname))
-        print('CREATE DATABASE {}'.format(hname))
+        # EC_t1903.curs.execute('DROP DATABASE IF EXISTS {}'.format(hname))
+        # print(hname)
+        # EC_t1903.curs.execute('CREATE DATABASE {}'.format(hname))
+        # print('CREATE DATABASE {}'.format(hname))
         #
 
         EC_t1903.conn.select_db("{}".format(hname))
