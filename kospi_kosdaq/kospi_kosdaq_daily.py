@@ -20,7 +20,11 @@ class EC_t1903:
     # store shcode
     shcode = ''
 
+    # daily, weekly, monthly, 1min, 3min, 5min, 60min
     time_frame = ''
+
+    # KOSPI / KOSDAQ / ETF
+    market = ''
 
     counter = 1
 
@@ -94,6 +98,8 @@ class EC_t1903:
 
 
 def t1903_request(shcode=None, date=None, time_frame='', seeded=True, market='', occurs=True):
+
+    EC_t1903.market = market
 
     if seeded == False:
         # Should do what it's currently doing RN
