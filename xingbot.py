@@ -2,7 +2,7 @@ from login import *
 from dotenv import load_dotenv
 from liststocks import *
 from dailychart import *
-# from spy_500.spy_500_seeder import *
+from spy_500.spy_500_seeder import *
 from spy_500.mysql_spy import *
 from spy_500.spy_500_backtester import *
 

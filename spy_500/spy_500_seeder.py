@@ -72,6 +72,9 @@ class EventClass_t3518:
             occurs_count = self.GetBlockCount("t3518OutBlock1")
             cts_date = self.GetFieldData("t3518OutBlock", "cts_date", 0)
             cts_time = self.GetFieldData("t3518OutBlock", "cts_time", 0)
+            print(occurs_count)
+            print(cts_date)
+            print(cts_time)
 
             for i in range(occurs_count):
                 inverse_idx = occurs_count - i - 1
@@ -114,6 +117,7 @@ class EventClass_t3518:
 
 def t3518_request(kind=None, symbol=None, cnt=None, jgbn=None, nmin=None, cts_date=None,
                   cts_time=None, occurs=False):
+    print('requested')
     timefnc.sleep(3.1)
     EventClass_t3518.t3518_e.SetFieldData("t3518InBlock", "kind", 0, "S")
     EventClass_t3518.t3518_e.SetFieldData("t3518InBlock", "symbol", 0, symbol)
