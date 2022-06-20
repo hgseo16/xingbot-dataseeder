@@ -96,19 +96,20 @@ class EC_t1903:
                 EC_t1903.tr_success = True
 
 
-def t1903_request(shcode=None, date=None, time_frame='', seeded=True, market='', occurs=False):
+def t1903_request(shcode=None, date=None, time_frame='', first_seed=False, market='', occurs=False):
 
     timefnc.sleep(3.1)
 
     # Pass type of "market"
     EC_t1903.market = market
 
-    # Pass time_frame (daily, 1min, 3min, etc) to method
+    # Pass "time_frame" (daily, 1min, 3min, etc) to method
     EC_t1903.time_frame = time_frame
 
     # Pass whether it's been "seeded"
-    EC_t1903.seeded = seeded
+    EC_t1903.first_seed = first_seed
 
+    # Pass "shcode"
     EC_t1903.shcode = shcode
 
     EC_t1903.t1903_e.SetFieldData("t1903InBlock", "shcode", 0, shcode)
@@ -190,10 +191,10 @@ def initialize_db(market, time_frame):
 
     else: # db exist
         print('db exist')
-        EC_t1903.curs.execute("DROP DATABASE IF EXISTS {}_{}".format(market, time_frame))
-        EC_t1903.curs.execute("CREATE DATABASE {}_{}".format(market, time_frame))
-        print("CREATE DATABASE {}_{}".format(market, time_frame))
-
+        # EC_t1903.curs.execute("DROP DATABASE IF EXISTS {}_{}".format(market, time_frame))
+        # EC_t1903.curs.execute("CREATE DATABASE {}_{}".format(market, time_frame))
+        # print("CREATE DATABASE {}_{}".format(market, time_frame))
+        EC_t1903.conn.select_db("{}_{}".format(market, time_frame))
         EC_t1903.conn.commit()
 
 def check_table(hname, market, time_frame):
