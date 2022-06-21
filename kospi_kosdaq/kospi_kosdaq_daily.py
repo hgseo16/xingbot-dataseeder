@@ -24,7 +24,7 @@ class EC_t1903:
     time_frame = ''
 
     # Checks whether data is seeded
-    seeded = ''
+    first_seed = ''
 
     # KOSPI / KOSDAQ / ETF
     market = ''
@@ -32,7 +32,7 @@ class EC_t1903:
     def OnReceiveData(self, code):
 
         if code == "t1903":
-            print('shcode: {}, time_frame: {}, seeded: {}, market: {}'.format(self.shcode, self.time_frame, self.seeded, self.market))
+            print('shcode: {}, time_frame: {}, first_seed: {}, market: {}'.format(self.shcode, self.time_frame, self.first_seed, self.market))
 
             occurs_count = self.GetBlockCount("t1903OutBlock1")
             cts_date = self.GetFieldData("t1903OutBlock", "date", 0)
@@ -90,7 +90,7 @@ class EC_t1903:
                 mysql_etf(hname, self.market, self.time_frame, date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate)
 
             if cts_date != "":
-                t1903_request(shcode=EC_t1903.shcode, date=cts_date, time_frame=self.time_frame, seeded=self.seeded, market=self.market, occurs=self.IsNext)
+                t1903_request(shcode=EC_t1903.shcode, date=cts_date, time_frame=self.time_frame, first_seed=self.first_seed, market=self.market, occurs=self.IsNext)
             else:
                 EC_t1903.conn.close()
                 EC_t1903.tr_success = True
