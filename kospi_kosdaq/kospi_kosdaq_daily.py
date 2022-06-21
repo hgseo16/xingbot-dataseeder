@@ -126,6 +126,8 @@ def t1903_request(shcode=None, date=None, time_frame='', first_seed=False, marke
 
 def mysql_etf(hname, market, time_frame, date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate):
 
+
+
     EC_t1903.conn.select_db('{}_{}'.format(market, time_frame))
 
     print(hname)
@@ -244,3 +246,6 @@ def check_table(hname, market, time_frame):
 
     else: # Table exist
         return
+
+def latest_date(hname, market, time_frame):
+    return
