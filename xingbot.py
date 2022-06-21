@@ -61,20 +61,20 @@ class Main():
         # Backtest_Engine()
 
 
-        # # Implement calling for ETF data
-        # # KODEX 레버리지 (122630)
-        # KODEX_LEVERAGE_t1903 = EC_t1903
-        # KODEX_LEVERAGE_t1903.t1903_e = wc.DispatchWithEvents("XA_DataSet.XAQuery", KODEX_LEVERAGE_t1903)
-        # KODEX_LEVERAGE_t1903.t1903_e.ResFileName = "C:/eBEST/xingAPI/Res/t1903.res"
-        # # 'first_seed' is False by default
-        # # 'market' parameter is divided into three 'kospi', 'kosdaq', 'etf'
-        # t1903_request(shcode="122630", date="", time_frame="daily", first_seed=True, market='kospi')
-        #
-        # # KODEX 200 선물인버스2X (252670)
-        # KODEX_200_INVERSE2X_t1903 = EC_t1903
-        # KODEX_200_INVERSE2X_t1903.t1903_e = wc.DispatchWithEvents("XA_DataSet.XAQuery", KODEX_200_INVERSE2X_t1903)
-        # KODEX_200_INVERSE2X_t1903.t1903_e.ResFileName = "C:/eBEST/xingAPI/Res/t1903.res"
-        # t1903_request(shcode="252670", date="", time_frame="daily", first_seed=True, market='kospi')
+        # Implement calling for ETF data
+        # KODEX 레버리지 (122630)
+        KODEX_LEVERAGE_t1903 = EC_t1903
+        KODEX_LEVERAGE_t1903.t1903_e = wc.DispatchWithEvents("XA_DataSet.XAQuery", KODEX_LEVERAGE_t1903)
+        KODEX_LEVERAGE_t1903.t1903_e.ResFileName = "C:/eBEST/xingAPI/Res/t1903.res"
+        # 'first_seed' is False by default
+        # 'market' parameter is divided into three 'kospi', 'kosdaq', 'etf'
+        t1903_request(shcode="122630", date="", time_frame="daily", first_seed=True, market='kospi')
+
+        # KODEX 200 선물인버스2X (252670)
+        KODEX_200_INVERSE2X_t1903 = EC_t1903
+        KODEX_200_INVERSE2X_t1903.t1903_e = wc.DispatchWithEvents("XA_DataSet.XAQuery", KODEX_200_INVERSE2X_t1903)
+        KODEX_200_INVERSE2X_t1903.t1903_e.ResFileName = "C:/eBEST/xingAPI/Res/t1903.res"
+        t1903_request(shcode="252670", date="", time_frame="daily", first_seed=True, market='kospi')
 
         # KODEX 코스닥 150 (229200)
         KODEX_KOSDAQ_150_t1903 = EC_t1903
