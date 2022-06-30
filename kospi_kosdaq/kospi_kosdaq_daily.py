@@ -29,9 +29,15 @@ class EC_t1903:
     # KOSPI / KOSDAQ / ETF
     market = ''
 
+    # Has the string value of the most recent date in table
+    maxdate = ''
+
+    # Stop iterating if True
+    breakcondition = False
+
     def OnReceiveData(self, code):
 
-        if code == "t1903":
+        if code == "t1903" and not self.breakcondition:
             print('shcode: {}, time_frame: {}, first_seed: {}, market: {}'.format(self.shcode, self.time_frame, self.first_seed, self.market))
 
             occurs_count = self.GetBlockCount("t1903OutBlock1")
@@ -87,13 +93,17 @@ class EC_t1903:
                 # print("jichange: {}".format(type(jichange)))
                 # print("jirate: {}".format(type(jirate)))
 
-                mysql_etf(hname, self.market, self.time_frame, date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate)
+                mysql_etf(hname, self.market, self.time_frame, self.maxdate, date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate)
 
             if cts_date != "":
                 t1903_request(shcode=EC_t1903.shcode, date=cts_date, time_frame=self.time_frame, first_seed=self.first_seed, market=self.market, occurs=self.IsNext)
-            else:
-                EC_t1903.conn.close()
-                EC_t1903.tr_success = True
+            # else:
+            #     EC_t1903.conn.close()
+            #     EC_t1903.tr_success = True
+
+        else:
+            EC_t1903.conn.close()
+            EC_t1903.tr_success = True
 
 
 def t1903_request(shcode=None, date=None, time_frame='', first_seed=False, market='', occurs=False):
@@ -124,30 +134,34 @@ def t1903_request(shcode=None, date=None, time_frame='', first_seed=False, marke
 
 
 
-def mysql_etf(hname, market, time_frame, date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate):
+def mysql_etf(hname, market, time_frame, maxdate, date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate):
 
 
 
     EC_t1903.conn.select_db('{}_{}'.format(market, time_frame))
-
     print(hname)
 
-    sql_insert_daily_data = '''
-    INSERT INTO {}
-    (일자, 현재가, 전일대비구분, 전일대비, 누적거래량, NAV대비, 
-    NAV, NAV전일대비, 추적오차, 괴리, 지수, 지수전일대비, 지수전일대비율)
-    VALUE
-    ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
-    '''.format(hname, str(date), str(price),
-               str(sign), str(change), str(volume),
-               str(navdiff), str(nav), str(navchange),
-               str(crate), str(grate), str(jisu),
-               str(jichange), str(jirate))
+    if maxdate != date:
+        # carry on with insert
+        sql_insert_daily_data = '''
+            INSERT INTO {}
+            (일자, 현재가, 전일대비구분, 전일대비, 누적거래량, NAV대비, 
+            NAV, NAV전일대비, 추적오차, 괴리, 지수, 지수전일대비, 지수전일대비율)
+            VALUE
+            ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
+            '''.format(hname, str(date), str(price),
+                       str(sign), str(change), str(volume),
+                       str(navdiff), str(nav), str(navchange),
+                       str(crate), str(grate), str(jisu),
+                       str(jichange), str(jirate))
 
-    print(sql_insert_daily_data)
-    EC_t1903.curs.execute(sql_insert_daily_data)
-    EC_t1903.conn.commit()
+        print(sql_insert_daily_data)
+        EC_t1903.curs.execute(sql_insert_daily_data)
+        EC_t1903.conn.commit()
 
+    else:
+        EC_t1903.breakcondition = True
+        return
 
 def initialize_db(market, time_frame):
 
@@ -207,12 +221,12 @@ def check_table(hname, market, time_frame):
     show_tables = '''
     SHOW TABLES LIKE '{}'
     '''.format(hname)
+    # print(show_tables)
 
-    print(show_tables)
     EC_t1903.curs.execute(show_tables)
 
     table = EC_t1903.curs.fetchall()
-    print(table)
+    # print(table)
 
     if table == (): # Table doesn't exist
         # Create Table
@@ -244,7 +258,17 @@ def check_table(hname, market, time_frame):
         print(time_frame)
         print('-------')
 
-    else: # Table exist
+    else: # Table exist, call the most recent row and save the date as instance variable
+        selectmax = '''
+        SELECT 일자
+        FROM {}
+        WHERE 일자 = (SELECT MAX(일자) FROM {})
+        '''.format(hname, hname)
+        # print(selectmax)
+        EC_t1903.curs.execute(selectmax)
+        maxdate = EC_t1903.curs.fetchall()
+        # print(maxdate)
+        EC_t1903.maxdate = maxdate
         return
 
 def latest_date(hname, market, time_frame):
