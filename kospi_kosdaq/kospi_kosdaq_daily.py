@@ -9,8 +9,10 @@ import sys
 sys.setrecursionlimit(1500)
 
 class EC_t1903:
+
     # Used to check tr status
     tr_success = False
+
     # Used for methods
     t1903_e = None
 
@@ -37,9 +39,8 @@ class EC_t1903:
 
     def OnReceiveData(self, code):
 
-        if code == "t1903" and not self.breakcondition:
+        if code == "t1903":
             print('shcode: {}, time_frame: {}, first_seed: {}, market: {}'.format(self.shcode, self.time_frame, self.first_seed, self.market))
-
             occurs_count = self.GetBlockCount("t1903OutBlock1")
             cts_date = self.GetFieldData("t1903OutBlock", "date", 0)
             # 종목명
@@ -47,7 +48,6 @@ class EC_t1903:
             hname = hname.replace(" ", "_")
             # 업종지수명
             upname = self.GetFieldData("t1903OutBlock", "upname", 0)
-
             print('occurs_count: {}'.format(occurs_count))
             print('cts_date: {}'.format(cts_date))
             print("hname: {}".format(hname))
@@ -60,8 +60,6 @@ class EC_t1903:
 
                 # Check whether table exists and create table if it doesn't
                 check_table(hname, self.market, self.time_frame)
-
-            print('first loop done')
 
             for i in range(occurs_count):
                 inverse_idx = occurs_count - i - 1
@@ -93,17 +91,17 @@ class EC_t1903:
                 # print("jichange: {}".format(type(jichange)))
                 # print("jirate: {}".format(type(jirate)))
 
-                mysql_etf(hname, self.market, self.time_frame, self.maxdate, date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate)
+                if self.maxdate < date:
+                    mysql_etf(hname, self.market, self.time_frame, self.maxdate, date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate)
 
-            if cts_date != "":
+            if cts_date != "" and self.maxdate <= cts_date:
                 t1903_request(shcode=EC_t1903.shcode, date=cts_date, time_frame=self.time_frame, first_seed=self.first_seed, market=self.market, occurs=self.IsNext)
-            # else:
-            #     EC_t1903.conn.close()
-            #     EC_t1903.tr_success = True
-
-        else:
-            EC_t1903.conn.close()
-            EC_t1903.tr_success = True
+            elif self.maxdate > cts_date :
+                EC_t1903.conn.close()
+                EC_t1903.tr_success = True
+            else:
+                EC_t1903.conn.close()
+                EC_t1903.tr_success = True
 
 
 def t1903_request(shcode=None, date=None, time_frame='', first_seed=False, market='', occurs=False):
@@ -133,35 +131,26 @@ def t1903_request(shcode=None, date=None, time_frame='', first_seed=False, marke
         pcom.PumpWaitingMessages()
 
 
-
 def mysql_etf(hname, market, time_frame, maxdate, date, price, sign, change, volume, navdiff, nav, navchange, crate, grate, jisu, jichange, jirate):
 
-
-
     EC_t1903.conn.select_db('{}_{}'.format(market, time_frame))
-    print(hname)
+    # print(hname)
 
-    if maxdate != date:
-        # carry on with insert
-        sql_insert_daily_data = '''
-            INSERT INTO {}
-            (일자, 현재가, 전일대비구분, 전일대비, 누적거래량, NAV대비, 
-            NAV, NAV전일대비, 추적오차, 괴리, 지수, 지수전일대비, 지수전일대비율)
-            VALUE
-            ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
-            '''.format(hname, str(date), str(price),
-                       str(sign), str(change), str(volume),
-                       str(navdiff), str(nav), str(navchange),
-                       str(crate), str(grate), str(jisu),
-                       str(jichange), str(jirate))
+    sql_insert_daily_data = '''
+        INSERT INTO {}
+        (일자, 현재가, 전일대비구분, 전일대비, 누적거래량, NAV대비, 
+        NAV, NAV전일대비, 추적오차, 괴리, 지수, 지수전일대비, 지수전일대비율)
+        VALUE
+        ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
+        '''.format(hname, str(date), str(price),
+            str(sign), str(change), str(volume),
+            str(navdiff), str(nav), str(navchange),
+            str(crate), str(grate), str(jisu),
+            str(jichange), str(jirate))
+    print(sql_insert_daily_data)
+    EC_t1903.curs.execute(sql_insert_daily_data)
+    EC_t1903.conn.commit()
 
-        print(sql_insert_daily_data)
-        EC_t1903.curs.execute(sql_insert_daily_data)
-        EC_t1903.conn.commit()
-
-    else:
-        EC_t1903.breakcondition = True
-        return
 
 def initialize_db(market, time_frame):
 
@@ -268,8 +257,5 @@ def check_table(hname, market, time_frame):
         EC_t1903.curs.execute(selectmax)
         maxdate = EC_t1903.curs.fetchall()
         # print(maxdate)
-        EC_t1903.maxdate = maxdate
+        EC_t1903.maxdate = maxdate[0][0]
         return
-
-def latest_date(hname, market, time_frame):
-    return
