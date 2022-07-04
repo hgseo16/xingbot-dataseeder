@@ -7,6 +7,7 @@ from spy_500.mysql_spy import *
 from spy_500.spy_500_backtester import *
 
 from kospi_kosdaq.kospi_kosdaq_daily import *
+from kospi_kosdaq.kospi_backtester import *
 
 from liststocks import *
 
@@ -69,6 +70,8 @@ class Main():
         # 'first_seed' is False by default
         # 'market' parameter is divided into three 'kospi', 'kosdaq', 'etf'
         t1903_request(shcode="122630", date="", time_frame="daily", first_seed=True, market='kospi')
+
+        Backtest_Engine()
 
         # KODEX 200 선물인버스2X (252670)
         KODEX_200_INVERSE2X_t1903 = EC_t1903
