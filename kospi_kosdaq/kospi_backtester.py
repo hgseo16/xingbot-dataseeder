@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 class Backtest_Engine:
 
-    def __init__(self):
+    def __init__(self, shcode, time_frame, market):
         print('Backtest_Engine Running...')
         # 2천만원
         self.initial_capital = 20000000.0
@@ -55,6 +55,7 @@ class Backtest_Engine:
 
     def Strategy(self):
         start = False
+        yesterday_price = 0
         SMA_3_list = []
         SMA_5_list = []
         SMA_10_list = []
@@ -93,11 +94,14 @@ class Backtest_Engine:
             if len(SMA_20_list) == 20:
                 SMA_20 = self.get_SMA(SMA_20_list, 20)
 
+            if yesterday_price != 0:
+                percentage_change = round((-1.0 + (row[1] / yesterday_price)), 2)
+
             # While stock is being held...
             if self.stock_held == True:
-                # row[5] is 등락률 or % change for the day
-                self.stock_held_percentage += (row[5])
-                print("당일등락률: {}".format(row[5]))
+                # percentage_change is 등락률 or % change for the day
+                self.stock_held_percentage += (percentage_change)
+                print("당일등락률: {}".format(percentage_change))
                 print("보유종목등락률: {}".format(self.stock_held_percentage))
 
             # Buy Condition
@@ -139,6 +143,8 @@ class Backtest_Engine:
                 print("amount_bought: {}".format(self.amount_bought))
                 self.stock_held_percentage = 0.0
                 self.cnt+=1
+
+            yesterday_price = row[1]
 
         print('--------------------')
         print('FINAL: {}'.format(row[0]))

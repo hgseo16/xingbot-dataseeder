@@ -71,7 +71,7 @@ class Main():
         # 'market' parameter is divided into three 'kospi', 'kosdaq', 'etf'
         t1903_request(shcode="122630", date="", time_frame="daily", first_seed=True, market='kospi')
 
-        Backtest_Engine()
+        Backtest_Engine(shcode="122630", time_frame="daily", market='kospi')
 
         # KODEX 200 선물인버스2X (252670)
         KODEX_200_INVERSE2X_t1903 = EC_t1903
