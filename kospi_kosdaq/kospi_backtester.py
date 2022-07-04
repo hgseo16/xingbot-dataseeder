@@ -64,13 +64,14 @@ class Backtest_Engine:
         SMA_10 = 0
         SMA_20 = 0
 
-        for row in self.rs:
-            curr_price = row[5]
-            # row(5) is the closing price (가격)
-            SMA_3_list.append(row[5])
-            SMA_5_list.append(row[5])
-            SMA_10_list.append(row[5])
-            SMA_20_list.append(row[5])
+        for idx, row in enumerate(self.rs):
+            print("{}th loop: ".format(idx))
+            curr_price = row[1]
+            # row(1) is the closing price (가격)
+            SMA_3_list.append(row[1])
+            SMA_5_list.append(row[1])
+            SMA_10_list.append(row[1])
+            SMA_20_list.append(row[1])
 
             # Maintains list size according to SMA
             if len(SMA_3_list) > 3:
@@ -94,27 +95,31 @@ class Backtest_Engine:
 
             # While stock is being held...
             if self.stock_held == True:
-                # row[8] is 등락률 or % change for the day
-                self.stock_held_percentage += (row[8])
-                print("당일등락률: {}".format(row[8]))
-                print("등락률: {}".format(self.stock_held_percentage))
+                # row[5] is 등락률 or % change for the day
+                self.stock_held_percentage += (row[5])
+                print("당일등락률: {}".format(row[5]))
+                print("보유종목등락률: {}".format(self.stock_held_percentage))
 
             # Buy Condition
             if (SMA_3 != 0) and (self.stock_held == False) and ((curr_price > float(SMA_3)) or (curr_price > float(SMA_5)) or (curr_price > float(SMA_10))):
-                if self.available_capital < row[5]:
+                if self.available_capital < row[2]:
                     continue
                 self.stock_held = True
-                # temp = self.available_capital // row[5]
-                self.num_bought = int(self.available_capital // row[5])
-                self.amount_bought = round(self.num_bought * row[5])
+                # temp = self.available_capital // row[1]
+                print("available_capital: {}".format(self.available_capital))
+                print("row[1]: {}".format(row[1]))
+                print('self.available_capital // row[1]: {}'.format(self.available_capital // row[1]))
+
+                self.num_bought = int(self.available_capital // row[1])
+                self.amount_bought = round(self.num_bought * row[1])
                 self.available_capital -= self.amount_bought
                 print('--------------------')
                 print('BOUGHT: {}'.format(row[0]))
                 print("available_capital: {}".format(self.available_capital))
-                print("stock_held_percentage: {}".format(self.stock_held_percentage))
                 print("num_bought: {}".format(self.num_bought))
                 print("amount_bought: {}".format(self.amount_bought))
 
+            # Sell Condition
             # Sell Condition
             # if (self.stock_held == True) and ((curr_price <= float(SMA_3)) and (curr_price <= float(SMA_5)) and (curr_price <= float(SMA_10))):
             if (self.stock_held == True) and ((curr_price <= float(SMA_20)) or self.stock_held_percentage <= -1.0):
@@ -145,4 +150,3 @@ class Backtest_Engine:
         # print("amount_bought: {}".format(self.amount_bought))
         print("Number of Trades: {}".format(self.cnt))
 
-        timefnc.sleep(5.1)
